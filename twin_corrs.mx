@@ -1,0 +1,108 @@
+# MX Script to calcalate twin correlations, threshold model (1 threshold)
+
+G1: calculation group
+Data Calc NGroups=7
+Begin matrices;
+	S stand 2 2 Free		! MZM (2 twins)
+ 	T stand 2 2 Free		! DZM
+ 	X stand 2 2 Free		! MZF
+ 	Y stand 2 2 Free		! DZF
+ 	Z stand 2 2 Free		! DOS
+
+	J Full 1 1 free			! threshold males
+	I Full 1 1 free			! threshold females
+	B Full 2 2 Fixed;
+
+st 0.25 all
+bound -5 5 I 11 J 1 1
+end
+
+G2: MZM
+Data  NInput_vars=14
+Missing=-1
+ord file=creativity_twinsonly.dat		
+LABELS
+FAMID ID.1 ID.2 crea.1 crea.2 age7.1 age7.2 age8.1 age8.2 sex.1 sex.2 zyg crea_dich1 crea_dich2
+Select if zyg =1
+Select crea_dich1 crea_dich2 /
+Matrices = group 1
+End matrices; 
+thresholds J | J ;
+Covariances S ;
+option no_output
+End
+
+G3: DZM 
+Data  NInput_vars=14
+Missing=-1
+ord file=creativity_twinsonly.dat		
+LABELS
+FAMID ID.1 ID.2 crea.1 crea.2 age7.1 age7.2 age8.1 age8.2 sex.1 sex.2 zyg crea_dich1 crea_dich2
+Select if zyg =2
+Select crea_dich1 crea_dich2 /
+Matrices = group 1 
+End matrices; 
+thresholds J | J ;
+Covariances	T ;
+option no_output
+End
+
+G4: MZF
+Data  NInput_vars=14
+Missing=-1
+ord file=creativity_twinsonly.dat		
+LABELS
+FAMID ID.1 ID.2 crea.1 crea.2 age7.1 age7.2 age8.1 age8.2 sex.1 sex.2 zyg crea_dich1 crea_dich2
+Select if zyg =3
+Select crea_dich1 crea_dich2 /
+Matrices = group 1 
+End matrices; 
+thresholds I | I ;
+ Covariances X ;
+option no_output
+end
+
+G5: DZF
+Data  NInput_vars=14
+Missing=-1
+ord file=creativity_twinsonly.dat		
+LABELS
+FAMID ID.1 ID.2 crea.1 crea.2 age7.1 age7.2 age8.1 age8.2 sex.1 sex.2 zyg crea_dich1 crea_dich2
+Select if zyg =4
+Select crea_dich1 crea_dich2 /
+Matrices = group 1 
+ End matrices; 
+Thresholds I | I  ;
+Covariances Y;
+option no_output
+end
+
+G6: DOS mf 
+Data  NInput_vars=14
+Missing=-1
+ord file=creativity_twinsonly.dat		
+LABELS
+FAMID ID.1 ID.2 crea.1 crea.2 age7.1 age7.2 age8.1 age8.2 sex.1 sex.2 zyg crea_dich1 crea_dich2
+Select if zyg =5
+Select crea_dich1 crea_dich2 /
+Matrices = group 1 
+End matrices; 
+thresholds J | I ;
+ Covariances Z ;
+option no_output
+end
+
+G7: DOS FM
+Data  NInput_vars=14
+Missing=-1
+ord file=creativity_twinsonly.dat		
+LABELS
+FAMID ID.1 ID.2 crea.1 crea.2 age7.1 age7.2 age8.1 age8.2 sex.1 sex.2 zyg crea_dich1 crea_dich2
+Select if zyg =6
+Select crea_dich1 crea_dich2 /
+Matrices = group 1 
+End matrices; 
+thresholds I | J ;
+ Covariances Z ;
+option no_output
+end

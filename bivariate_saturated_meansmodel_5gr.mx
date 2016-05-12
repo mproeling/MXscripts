@@ -1,0 +1,373 @@
+# BIVARIATE MX SCRIPT MEANS MODEL WITH COVARIATES SEX AGE
+# VU Amsterdam, 2010.
+# contributions from Dr MA Distel, MP Roeling, J van Tielbeek, D van Toor, published in:
+# Distel MA, Roeling MP, van Tielbeek J, van Toor D, Derom C, Trull T, Boomsma DI. 
+# The covariation of trait anger and borderline personality: A bivariate twin-siblings study. 
+# Journal of Abnormal Psychology, 121(2), 458-66, 2012.
+
+######################## START ###########################
+#Ngroups 6		!number of groups in the mx script: CALC group, MZM, MZF, DZM, DZF and DOS group
+#define nvar 2	!number of variables 
+#define ndef 2	!number of covariates
+
+G1: Calculation group
+Data Calc 
+Begin matrices;
+G full 1 nvar free                      	   		   ! grand mean twins
+H full 1 nvar free                                	          ! grand mean sibs
+
+P Full ndef nvar Free                                       ! estimated effects of the covariates (sex age)
+
+A symm nvar nvar free		! MZM				
+B symm nvar nvar free		! DZM		
+C symm nvar nvar free		! MZF				
+D symm nvar nvar free		! DZF			
+E symm nvar nvar free 		! DOS
+F symm nvar nvar free		! br-br
+J symm nvar nvar free		! sis-sis
+K symm nvar nvar free		! br-sis
+
+M stand nvar nvar free		! fenotypische correlatie males
+L stand nvar nvar free		! fenotypische correlatie females 
+       end matrices;
+
+st .45 M 2 1 L 2 1  
+
+!hieronder het full model twins
+st 2 G 1 1		!Mean BPD 
+st 10 G 1 2 		!Mean ANGER
+
+!hieronder het full model sibs
+st 2 H 1 1		!Mean BPD 
+st 10 H 1 2 		!Mean ANGER
+
+!hieronder het covariates (sex age)
+st 0.2 P 1 1		!sex effect BPD
+st -.01 P 1 2		!sex effect ANGER
+st -.01 P 2 1 		!age effect BPD
+st -.05 P 2 2 		!age effect ANGER
+
+!hieronder de monozygote mannen
+st .46 A 1 1 		! MZM twin corr BPD
+st .23 A 2 1 		! MZM Cross twin cross trait
+st .3 A 2 2		! MZM twin corr ANGER 
+
+!hieronder de dizygote mannen
+st .25 B 1 1 		! DZM twin corr BPD
+st .1 B 2 1 		! DZM Cross twin cross trait
+st .15 B 2 2		! DZM twin corr ANGER 
+
+!hieronder de monozygote vrouwen
+st .46 C 1 1 		! MZF twin corr BPD
+st .23 C 2 1 		! MZF Cross twin cross trait
+st .3 C 2 2		! MZF twin corr ANGER
+
+!hieronder de dizygote vrouwen
+st .15 D 1 1 		! DZF twin corr BPD
+st .1 D 2 1 		! DZF Cross twin cross trait
+st .16 D 2 2		! DZF twin corr ANGER 
+
+!hieronder de dizygote other sex
+st .2 E 1 1 		! DOS twin corr BPD
+st .07 E 2 1 		! DOS Cross twin cross trait
+st .1 E 2 2		! DOS twin corr ANGER 
+
+!hieronder de broer-broer
+st .15 F 1 1 		! BR-BR twin corr BPD
+st .05 F 2 1 		! BR-BR Cross twin cross trait
+st .05 F 2 2		! BR-BR twin corr ANGER
+
+!hieronder de zus-zus
+st .24 J 1 1 		! SIS-SIS twin corr BPD
+st .13 J 2 1 		! SIS-SIS Cross twin cross trait
+st .15 J 2 2		! SIS-SIS twin corr ANGER
+
+!hieronder de broer-zus
+st .14 K 1 1 		! BR-SIS twin corr BPD
+st .1 K 2 1 		! BR-SIS Cross twin cross trait
+st .15 K 2 2		! BR-SIS twin corr ANGER
+
+end
+
+G2: MZM + 2 brothers + 2 sisters (6x6 matrix)
+Data NInput_vars=32
+missing=-1.00	
+Rectangular file=bpdanger.dat   
+
+labels 
+TRAPPREG zyg sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BOR1 BOR2 BOR3 BOR4 BOR5 BOR6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6
+
+
+select if zyg = 1;			!select all MZM twins
+
+select  
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6;			! select variables of interest
+
+definition
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 ;
+	             
+Matrices=group 1     	 			
+S diag 12 12  free					! SD
+N Full 1 ndef  fix						! observed covariates for twin 1 sex, age
+O Full 1 ndef  fix						! observed covariates for twin 2 sex, age
+U Full 1 ndef  fix						! observed covariates for brother1 sex, age
+Y Full 1 ndef  fix						! observed covariates for brother2 sex, age
+Z Full 1 ndef  fix						! observed covariates for sister1 sex, age
+X Full 1 ndef  fix						! observed covariates for sister2 sex, age
+End Matrices;
+
+Begin algebra;
+R=
+M | A  | F   | F  | K | K_
+A  | M | F   | F  | K | K_
+F  | F  | M  | F  | K | K_
+F  | F  | F   | M | K | K_
+K  | K  | K  | K  | L | J_
+K  | K  | K  | K  | J | L ;
+end algebra;
+
+Specify N sex1 age1 
+Specify O sex2 age2
+Specify U sex3 age3 
+Specify Y sex4 age4 
+Specify Z sex5 age5 
+Specify X sex6 age6
+
+Specify S
+301 401 301 401 301 401 301 401 302 402 302 402  	!twins brothers sisters SD
+
+Means G+N*P | G+O*P | H+U*P | H+Y*P | H+Z*P | H+X*P ;			!Means model
+
+cov S*R*S' ;				! model for MZM variance/covariances
+
+Options RS				! give residuals (observed covariances and expected covariances)
+st 3 S 1 1 S 3 3 S 5 5 S 7 7 S 9 9 S 11 11
+st 6 S 2 2 S 4 4 S 6 6 S 8 8 S 10 10 S 12 12 
+end
+
+G3: DZM + 2 brothers + 2 sisters (6x6 matrix)
+Data NInput_vars=32
+missing=-1.00
+Rectangular file=bpdanger.dat  
+   
+labels 
+TRAPPREG zyg sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BOR1 BOR2 BOR3 BOR4 BOR5 BOR6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6
+
+select if zyg = 2;			! select all DZM twins
+
+select  
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6;			! select variables of interest
+
+definition
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 ;
+	             
+Matrices=group 1     	 			
+S diag 12 12  free					! SD
+N Full 1 ndef  fix						! observed covariates for twin 1 sex, age
+O Full 1 ndef  fix						! observed covariates for twin 2 sex, age
+U Full 1 ndef  fix						! observed covariates for brother1 sex, age
+Y Full 1 ndef  fix						! observed covariates for brother2 sex, age
+Z Full 1 ndef  fix						! observed covariates for sister1 sex, age
+X Full 1 ndef  fix						! observed covariates for sister2 sex, age
+End Matrices;
+
+Begin algebra;
+R=
+M | B  | F   | F  | K | K_
+B | M | F   | F  | K | K_
+F  | F  | M  | F  | K | K_
+F  | F  | F   | M | K | K_
+K  | K  | K  | K  | L | J_
+K  | K  | K  | K  | J | L ;
+end algebra;
+
+Specify N sex1 age1 
+Specify O sex2 age2
+Specify U sex3 age3 
+Specify Y sex4 age4 
+Specify Z sex5 age5 
+Specify X sex6 age6
+
+Specify S
+301 401 301 401 301 401 301 401 302 402 302 402  	!twins brothers sisters SD
+
+Means G+N*P | G+O*P | H+U*P | H+Y*P | H+Z*P | H+X*P ;			!Means model
+
+cov S*R*S' ;				! model for MZM variance/covariances
+
+Options RS				! give residuals (observed covariances and expected covariances)
+st 3 S 1 1 S 3 3 S 5 5 S 7 7 S 9 9 S 11 11
+st 6 S 2 2 S 4 4 S 6 6 S 8 8 S 10 10 S 12 12 
+end
+
+G4: MZF + 2 brothers + 2 sisters (6x6 matrix)
+Data NInput_vars=32
+missing=-1.00
+Rectangular file=bpdanger.dat
+
+labels 
+TRAPPREG zyg sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BOR1 BOR2 BOR3 BOR4 BOR5 BOR6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6
+
+select if zyg = 3;			! select all MZF twins
+
+select  
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6;			! select variables of interest
+
+definition
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 ;
+	             
+Matrices=group 1     	 			
+S diag 12 12  free					! SD
+N Full 1 ndef  fix						! observed covariates for twin 1 sex, age
+O Full 1 ndef  fix						! observed covariates for twin 2 sex, age
+U Full 1 ndef  fix						! observed covariates for brother1 sex, age
+Y Full 1 ndef  fix						! observed covariates for brother2 sex, age
+Z Full 1 ndef  fix						! observed covariates for sister1 sex, age
+X Full 1 ndef  fix						! observed covariates for sister2 sex, age
+End Matrices;
+
+Begin algebra;
+R=
+L  | C | K  | K | J | J_
+C  | L | K  | K | J | J_
+K  | K | M | F  | K | K_
+K  | K | F  | M | K | K_
+J  | J  | K  | K  | L | J_
+J  | J  | K  | K  | J | L ;
+end algebra;
+
+Specify N sex1 age1 
+Specify O sex2 age2
+Specify U sex3 age3 
+Specify Y sex4 age4 
+Specify Z sex5 age5 
+Specify X sex6 age6
+
+Specify S
+302 402 302 402 301 401 301 401 302 402 302 402  	!twins brothers sisters SD
+
+Means G+N*P | G+O*P | H+U*P | H+Y*P | H+Z*P | H+X*P ;			!Means model
+
+cov S*R*S' ;				! model for MZM variance/covariances
+
+Options RS				! give residuals (observed covariances and expected covariances)
+st 3 S 1 1 S 3 3 S 5 5 S 7 7 S 9 9 S 11 11
+st 6 S 2 2 S 4 4 S 6 6 S 8 8 S 10 10 S 12 12 
+end
+
+G5: DZF + 2 brothers + 2 sisters (6x6 matrix)
+Data NInput_vars=32
+missing=-1.00	
+Rectangular file=bpdanger.dat    
+  
+labels 
+TRAPPREG zyg sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BOR1 BOR2 BOR3 BOR4 BOR5 BOR6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6
+
+select if zyg = 4;			! select all DZF twins
+
+select  
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6;			! select variables of interest
+
+definition
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 ;
+	             
+Matrices=group 1     	 			
+S diag 12 12  free					! SD
+N Full 1 ndef  fix						! observed covariates for twin 1 sex, age
+O Full 1 ndef  fix						! observed covariates for twin 2 sex, age
+U Full 1 ndef  fix						! observed covariates for brother1 sex, age
+Y Full 1 ndef  fix						! observed covariates for brother2 sex, age
+Z Full 1 ndef  fix						! observed covariates for sister1 sex, age
+X Full 1 ndef  fix						! observed covariates for sister2 sex, age
+End Matrices;
+
+Begin algebra;
+R=
+L  | D | K  | K | J | J_
+D  | L | K  | K | J | J_
+K  | K | M | F  | K | K_
+K  | K | F  | M | K | K_
+J  | J  | K  | K  | L | J_
+J  | J  | K  | K  | J | L ;
+end algebra;
+
+Specify N sex1 age1 
+Specify O sex2 age2
+Specify U sex3 age3 
+Specify Y sex4 age4 
+Specify Z sex5 age5 
+Specify X sex6 age6
+
+Specify S
+302 402 302 402 301 401 301 401 302 402 302 402  	!twins brothers sisters SD
+
+Means G+N*P | G+O*P | H+U*P | H+Y*P | H+Z*P | H+X*P ;			!Means model
+
+cov S*R*S' ;				! model for MZM variance/covariances
+
+Options RS				! give residuals (observed covariances and expected covariances)
+st 3 S 1 1 S 3 3 S 5 5 S 7 7 S 9 9 S 11 11
+st 6 S 2 2 S 4 4 S 6 6 S 8 8 S 10 10 S 12 12 
+end 
+
+G6: DOS + 2 brothers + 2 sisters (6x6 matrix)
+Data NInput_vars=32
+missing=-1.00	
+Rectangular file=bpdanger.dat   
+  
+labels 
+TRAPPREG zyg sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BOR1 BOR2 BOR3 BOR4 BOR5 BOR6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6 
+
+
+select if zyg > 4;			! select all DOS twins + overige sibs
+
+select  
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 BPD1 BPD2 BPD3 BPD4 BPD5 BPD6 ANGER1 ANGER2 ANGER3 ANGER4 ANGER5 ANGER6;			! select variables of interest
+
+definition
+sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6 ;
+	             
+Matrices=group 1     	 			
+S diag 12 12  free					! SD
+N Full 1 ndef  fix						! observed covariates for twin 1 sex, age
+O Full 1 ndef  fix						! observed covariates for twin 2 sex, age
+U Full 1 ndef  fix						! observed covariates for brother1 sex, age
+Y Full 1 ndef  fix						! observed covariates for brother2 sex, age
+Z Full 1 ndef  fix						! observed covariates for sister1 sex, age
+X Full 1 ndef  fix						! observed covariates for sister2 sex, age
+End Matrices;
+
+Begin algebra;
+R=
+M  | E | F   | F  | K | K_
+E  | L | K   | K  | J | J_
+F  | K | M  | F  | K | K_
+F  | K | F   | M | K | K_
+K  | J  | K  | K  | L | J_
+K  | J  | K  | K  | J | L ;
+end algebra;
+
+Specify N sex1 age1 
+Specify O sex2 age2
+Specify U sex3 age3 
+Specify Y sex4 age4 
+Specify Z sex5 age5 
+Specify X sex6 age6
+
+Specify S
+301 401 302 402 301 401 301 401 302 402 302 402  	!twins brothers sisters SD
+
+Means G+N*P | G+O*P | H+U*P | H+Y*P | H+Z*P | H+X*P ;			!Means model
+
+cov S*R*S' ;				! model for MZM variance/covariances
+
+Options RS				! give residuals (observed covariances and expected covariances)
+st 3 S 1 1 S 3 3 S 5 5 S 7 7 S 9 9 S 11 11
+st 6 S 2 2 S 4 4 S 6 6 S 8 8 S 10 10 S 12 12 
+
+Options nd=2			! 2 decimals in the output
+Options Multiple Issat	! an option to test multiple models compared to the fully saturated model
+
+end
+ 
+

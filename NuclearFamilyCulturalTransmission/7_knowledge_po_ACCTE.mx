@@ -1,0 +1,380 @@
+! Script for the analysis of Twins+Parents
+! With assortative mating, dominance and cultural transmission
+! Genetic analysis of Talent.
+! bewerkt van neale2.mx, artikel uit 1994
+
+#define nvar 1					! one phenotype per subject
+#define nthres 2					! number of thresholds
+#define nind 4					! number of individuals per family
+
+!!!!!!!
+!!MODEL
+!!!!!!!
+
+Group 1: Mother-Father covariance
+Data Calculation NGroups=16
+Matrices
+D Full nvar nvar  free     			! assortative mating delta paths
+P Symm nvar nvar  fix      		! within person covariance (Rp)
+Compute  P*D*P /
+Start 1.0 P 1 1 
+start 0.05 D 1 1
+!Option No_output
+Option RSiduals 
+End
+
+Group 2: Calculate T   Genotype-Phenotype covariance
+Data Calculation
+Matrices
+C Low  nvar nvar free     			! common environment paths
+G Symm nvar nvar  free      		! additive genetic covariance (Ra)
+A Low  nvar nvar  free      			! additive genetic paths
+S Full nvar nvar free        			! A-C covariance
+Compute  G*A' + S*C' /
+Start  1 G 1 1
+Start .4 A 1 1 
+Start .3 C 1 1
+Start 1 S 1 1
+!bound .001 5 C 1 1 
+!Option No_output
+Option RSiduals 
+End
+
+Group 3: Mother-Child covariance
+Data Calculation
+Matrices
+D Full nvar nvar = D1  			! assortative mating delta paths from group 1
+C Low  nvar nvar = C2  			! common environment paths
+F Full nvar nvar free  				! paternal cultural transmission
+H Full 1 1        					! scalar, .5
+I Iden nvar nvar       				! identity matrix
+A Low  nvar nvar = A2  			! additive genetic paths
+M Full nvar nvar free				! maternal cultural transmission
+P Symm nvar nvar = P1  			! within person covariance (Rp)
+T Full nvar nvar = %E2   			! A-P covariance
+W Full nvar nvar = %E1   			! spouse covariance
+Compute  (P*M' + W*F')*C' + (I+P*D)*T'*(H@A') /
+Equate F 1 1 M 1 1
+!bound .001 5 F 1 1 
+Start 0.2 F 1 1
+Matrix H 0.5
+Option RSiduals 
+End
+
+Group 4: Father-Child Covariance
+Data Calculation
+Matrices
+D Full nvar nvar = D(1)  			! assortative mating delta paths 
+C Low  nvar nvar = C(2)  			! common environment paths
+F Full nvar nvar = F(3) 	 		! paternal cultural transmission
+H Full 1 1 =H(3)  					! scalar .5
+I Iden nvar nvar       				! identity matrix
+A Low  nvar nvar = A(2)  			! additive genetic paths
+M Full nvar nvar = M(3)  			! maternal cultural transmission
+P Symm nvar nvar = P(1)  		! within person covariance (Rp)
+T Full nvar nvar = %E2   			! A-P covariance                 
+W Full nvar nvar = %E1   			! spouse covariance
+Compute  (P*F' + W'*M')*C' +(I+P*D')*T'*(H@A') /
+!Option No_output
+Option RSiduals 
+End
+
+Group 5:   MZ Twin Covariance
+Data Calculation
+Matrices;
+R Sy nvar nvar free   				! common environment covariance          
+C Low  nvar nvar = C(2)  			! common environment paths  
+G Sy nvar nvar = G(2)  			! additive genetic covariance
+A Low  nvar nvar = A(2)  			! additive genetic paths             
+S Full nvar nvar = S(2)  			! A-C covariance                               
+N Low  nvar nvar fix  			! non-additive paths
+Compute  A*G*A' + C*R*C' +A*S*C' + C*S'*A' + N*N' /
+Start 1.0 R 1 1
+!Start 0.4 N 1 1
+Option RSiduals 
+End
+
+Group 6:   DZ Twin Covariance
+Data Calculation
+Matrices
+R Symm nvar nvar = R(5)  		! common environment covariance          
+D Full nvar nvar = D(1) 			! assortative mating delta paths 
+C Low  nvar nvar = C(2)  			! common environment paths  
+G Symm nvar nvar = G(2)  		! additive genetic covariance
+H Full 1 1 = H(3)  				! scalar, .5
+A Low  nvar nvar = A(2) 			! additive genetic paths             
+S Full nvar nvar = S(2)  			! A-C covariance                         
+T Full nvar nvar = %E2   			! A-P covariance                 
+N Low  nvar nvar = N(5)  			! non-additive paths
+Compute  H@A*(G+H@(T*(D'+D)*T'))*A' + C*R*C' +A*S*C' + C*S'*A' +H@H@N*N'/
+!Option No_output
+Option RSiduals 
+End
+
+!!!!!!!!!!!!
+!!CONSTRAINTS
+!!!!!!!!!!!!!
+
+Group 7:  Genetic Constraint    (Equation 3)
+Data Constraint
+Matrices
+D Full nvar nvar = D(1)  			! assortative mating delta paths
+G Symm nvar nvar = G(2)  		! additive genetic covariance 
+H Full 1 1 = H(3)  				! scalar, .5
+I Iden nvar nvar       				! to form segregation variance, .5I
+T Full nvar nvar = %E2   			! A-P covariance
+Constraint  G =(H@(G+H@(T*(D'+D)*T')+I)) /
+Option Rsidual
+End
+
+Group 8: A-C Constraint   diagonal and below (Equation 2)
+Data Constraint 
+Matrices
+D Full nvar nvar = D(1)  			! assortative mating delta paths
+F Full nvar nvar = F(3)  			! paternal cultural transmission
+H Full 1 1 = H(3)  				! scalar, .5
+M Full nvar nvar = M(3)  			! maternal cultural transmission
+P Symm nvar nvar = P(1)  		! within person covariance (Rp)
+S Full nvar nvar = S(2)  			! A-C covariance 
+T Full nvar nvar = %E2   			! A-P covariance
+Constraint   S =(H@T*(M'+F'+D*P*M'+D'*P*F')) /
+Option Rsidual
+End
+
+Group 9: Phenotypic Variance Constraint           (Equation 5)
+Constraint 
+Matrices
+R Symm nvar nvar = R(5)  		! common environment covariance          
+C Low  nvar nvar = C(2)  			! common environment paths  
+G Symm nvar nvar = G(2)  		! additive genetic covariance (Ra)
+J Low  nvar nvar free   			! specific environment paths
+A Low  nvar nvar = A(2)  			! additive genetic paths             
+P Symm nvar nvar = P(1)  		! within person covariance (Rp)
+S Full nvar nvar = S(2) 			! A-C covariance                               
+N Low  nvar nvar = N(5)
+Constraint P=(A*G*A' + C*R*C' + J*J'+ A*S*C' + C*S'*A' + N*N') /
+Option Rsidual
+Start .707 J 1 1
+End
+
+Group 10: Common Environment Constraint     (Equation 4)
+Constraint 
+Matrices
+B zero nvar nvar     	 	 		! common environment residual variance  (identity matrix)
+R Symm nvar nvar = R(5)  		! common environment covariance          
+F Full nvar nvar = F(3)  			! paternal cultural transmission
+M Full nvar nvar = M(3)  			! maternal cultural transmission
+P Symm nvar nvar = P(1)  		! within person covariance
+W Full nvar nvar = %E1   			! spouse covariance
+Constraint R =(M*P*M' + F*P*F' + M*W*F' + F*W'*M' + B) /
+Start 1 R 1 1 
+Option Rsidual
+End
+
+!!!!!!
+!!DATA
+!!!!!!
+
+G11 - MZ Twins and parents  
+Data NInput_vars= 19 			
+Missing=-1
+ORdinal_data file=knowledge.dat
+LABELS reg zyg zygmzdz zage.31 zage.41 zage.1 zage.2 age.31 age.41 age.1 age.2 sex.31 sex.41 sex.1 sex.2 father.31 mother.41 twin.1 twin.2 
+
+Select if zygmzdz = 1; 		! select MZ
+Select 	father.31 mother.41 twin.1 twin.2
+ 		zage.31 zage.41 zage.1 zage.2  ;	
+  Definition zage.31 zage.41 zage.1 zage.2 ;
+
+Begin Matrices;
+A Full nvar nvar = %E3  			! Mother-child covariances  
+B Full nvar nvar = %E4  			! Father-child covariances  
+C Full nvar nvar = %E5  			! MZ twin covariances
+D Full nvar nvar = %E1  			! Spouse covariances        
+E Symm nvar nvar = P1   			! Within person covariances 
+
+T Full nthres nind Free ;			!Thresholds
+J Lower nthres nthres Fixed ;
+H Full nthres nind Free;			!Beta first covariate
+G Full nthres nind Fixed;			!Observed first covariate
+End Matrices;
+
+ Value 1 J 1 1 - J nthres nthres
+Specify T 	120 130 140 140  			
+             		121 131 141 141		!Een aparte threshold voor de ouders die over alle groepen hetzelfde is.
+Specify H 	160 0 0 0 
+			160 0 0 0 
+Specify G 	zage.31 zage.41 zage.1 zage.2
+			zage.31 zage.41 zage.1 zage.2	
+
+Covariance 	(E | D' | B | B )_
+         		(D | E  | A | A )_
+           		(B'| A' | E | C )_
+           		(B'| A' | C'| E )  / 
+
+Thresholds J*T+H.G;				!Same threshold assumed within sex
+ 
+ Start -0.5 T 1 1 T 1 2 T 1 3 T 1 4 
+ Start 0.1 T 2 1 T 2 2 T 2 3 T 2 4 
+ Start 0.1 H 1 1 - H 2 4 
+  Bound -5.555 5.555 T 1 1 T 1 2 T 1 3 T 1 4 
+  Bound 0.1 5.555 T 2 1 T 2 2 T 2 3 T 2 4 
+Option rs
+OPT func=1.E-8
+End
+
+Group 12 - DZ twins and parents
+Data NInput_vars= 19 			
+Missing=-1
+ORdinal_data file=knowledge.dat
+LABELS reg zyg zygmzdz zage.31 zage.41 zage.1 zage.2 age.31 age.41 age.1 age.2 sex.31 sex.41 sex.1 sex.2 father.31 mother.41 twin.1 twin.2 
+
+Select if zygmzdz = 2; 		! select DZ
+Select 	father.31 mother.41 twin.1 twin.2
+ 		zage.31 zage.41 zage.1 zage.2  ;	
+  Definition zage.31 zage.41 zage.1 zage.2 ;
+
+Begin Matrices;
+A Full nvar nvar = %E3 	 		! Mother-child covariances
+B Full nvar nvar = %E4  			! Father-child covariances
+K Full nvar nvar = %E6  			! DZ twin covariances
+D Full nvar nvar = %E1  			! Spouse covariances
+E Symm nvar nvar = P1   			! Within person covariances
+
+T Full nthres nind free ;			!Thresholds
+J Lower nthres nthres Fixed ;
+H Full nthres nind free ;			!Beta first covariate
+G Full nthres nind Fixed;			!Observed first covariate
+End Matrices;
+
+Value 1 J 1 1 - J nthres nthres
+Specify G 	zage.31 zage.41 zage.1 zage.2
+			zage.31 zage.41 zage.1 zage.2	
+Specify T 	120 130 140 140  			
+             		121 131 141 141			
+Specify H 	160 0 0 0 
+			160 0 0 0 
+
+Covariance 	(E | D' | B | B )_
+         		(D | E  | A | A )_
+           		(B'| A' | E | K )_
+           		(B'| A' | K'| E )  / 
+
+Thresholds J*T+H.G;				!Same threshold assumed within sex
+Option Rsidual IT=800
+OPT func=1.E-8
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!
+!!STANDARDIZE & SUMARIZE
+!!!!!!!!!!!!!!!!!!!!!!!!
+
+Group 13: Calculate Expected Phenotypic Standard Deviations
+Data Calculation
+Matrices
+H Full 1 1 = H(3) 					! scalar, .5
+I Iden nvar nvar      		 		! identity matrix
+P Symm nvar nvar = P(1) 			! within-person covariance (Rp)
+Compute (I.P)^H /
+Option Rsidual
+End
+
+Group 14:  Standardize assortment matrix
+Data Calculation
+Matrices
+D Full nvar nvar = D(1)  			! assortative mating delta paths
+S Full nvar nvar = %E13  			! Phenotypic standard deviations
+Compute  S*D*S /
+Option Rsidual
+End
+
+!-------------------------------------------------------------------C-----------------------------------------------
+/*
+Group 15: Standardize maternal cultural transmission
+Data Calculation
+Matrices
+R Symm nvar nvar = R(5)  		! common environment covariance (Rc)
+H Full 1 1 = H(3)  				! scalar, .5
+I Iden nvar nvar       				! Identity matrix
+M Full nvar nvar = M(3)  			! Maternal cultural transmission
+S Full nvar nvar = %E13 			! Phenotypic standard deviations
+Compute  ((I.R)^H)~*M*S /
+Option Rsidual
+End
+
+Group 16: Standardize paternal cultural transmission
+Data Calculation
+Matrices
+R Symm nvar nvar = R(5)  		! common environment covariance (Rc)
+F Full nvar nvar = F(3) 			! paternal cultural transmission
+H Full 1 1 = H(3)  				! scalar, .5
+I Iden nvar nvar      				! Identity matrix
+S Full nvar nvar = %E13  			! Phenotypic standard deviations
+Compute  ((I.R)^H)~*F*S /
+Option Rsidual
+End
+*/
+
+Group 15: Standardize A paths
+Data Calculation
+Matrices
+G Symm nvar nvar = G(2)  		! additive genetic covariance (Ra)
+H Full 1 1 = H(3)  				! Scalar, .5
+I Iden nvar nvar       				! Identity matrix
+A Low  nvar nvar = A(2) 			! additive genetic paths 
+S Full nvar nvar = %E13  			! Phenotypic standard deviations
+Compute  S~*A*((I.G)^H) /
+Option Rsidual
+End
+
+/*
+Group 15: Standardize C paths
+Data Calculation
+Matrices
+R Symm nvar nvar = R(5)  		! common environment covariance (Rc)
+C Low  nvar nvar = C(2) 			! common environment paths  
+H Full 1 1 = H(3) 					! Scalar, .5
+I Iden nvar nvar      				! Identity matrix
+S Full nvar nvar = %E17  			! Phenotypic standard deviations
+Compute  S~*C*((I.R)^H) /
+Option Rsidual
+End
+*/
+
+Group 16: Print parameter estimates
+Data calc
+Matrices
+A Low  nvar nvar = A(2)  			! additive genetic paths
+C Low  nvar nvar = C(2)  			! common environment paths
+D Full nvar nvar = D(1)  			! assortative mating delta paths from group 1
+F Full nvar nvar = F(3)  			! paternal cultural transmission
+G Symm nvar nvar = G(2)  		! additive genetic covariance (Ra)
+J Low  nvar nvar = j9   			! specific environment paths
+M Full nvar nvar = M(3)  			! maternal cultural transmission
+N Low  nvar nvar = n5    			! non-additive genetic paths
+P Symm nvar nvar = P(1)  		! within person covariance (Rp)
+R Symm nvar nvar = R(5)  		! common environment covariance (Rc)
+S Full nvar nvar = s2    			! A-C covariance
+Compute
+\vech(a)_\vech(n)_\vech(c)_\vech(j)_\m2v(d)_\vech(g)_\vech(r)_
+\m2v(s)_\m2v(m)_\m2v(f)  /
+option rs nd=3
+option df=-4
+option multiple issat
+end 
+
+!No common environment
+drop @0 C 2 1 1
+drop @0 F 3 1 1
+option df=-4 
+end
+
+
+
+
+
+
+
+
+
+
