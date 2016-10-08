@@ -1,0 +1,2902 @@
+  **MX-PC 1.68e** Job started on 10/08/16 at 22:07:05
+ 
+ 
+ ! SCRIPT NAME	:  creacovage_tests_jan30.mx - dit script is voor: twin 1, twin 2, brother 1, brother 2, sister 1, sister 2
+ ! COVARIATES	: AGE SEX
+ ! GOAL		: calculation of tetrachoric correlations, check assumptions of twin model,
+ ! PARAMETERS: TOTAL= 16 [4 thresholds; twin males, twin females, brothers, sisters] + 8 correlaties (MZM DZM MZF DZF DOS-fm br-br si-si br-si) + 4 cov [age males, age females, sex males, sex females].
+ ! DATA		: ordinal, one threshold
+ ! INPUT		: raw data
+ ! UNI/BI/MULTI	: uni
+ ! DATA-GROUPS	: MZM, DZM, MZF, DZF, DOSMF [ordered in data cleaning]
+ ! M.P. Roeling, Jan 2016, VU Amsterdam
+ 
+ !---------------------------------------------------------------------MZM----------------------------------------------------------------------
+ 
+ #define nvar 1							! one phenotype per subject
+ #define nthres 1							! number of thresholds
+ #define nind 6							! number of individuals
+ 
+ G1: MZM
+ 
+ 
+ The following MX script lines were read for group    1
+ 
+ G1: MZM
+ NGroups = 5	
+ Data NInput_vars= 20
+ Missing=-1
+  
+  NOTE: Missing value *string* set to '-1'
+  
+ ORdinal_data file=mxinputdata.dat		! read in raw ordinal datafile, must be in same directory
+  Ordinal data read initiated
+  Note: Maximum ordinal/rectangular record length is:  1000
+  Note: It be increased by maxrec= parameter on the data line.
+  
+  NOTE: Rectangular file contained  4742 records with data
+        that contained a total of  74976 observations
+  
+ 	
+ LABELS
+ trapreg zyg crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6
+ 
+ select if zyg = 1; 							! select MZM
+  
+  NOTE: Select if yields  635 data vectors for analysis
+  NOTE: Vectors contain a total of      10084 observations
+  
+ 
+ select
+ crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+ 
+ definition
+  
+  NOTE: Selection yields  635 data vectors for analysis
+  NOTE: Vectors contain a total of  8814 observations
+  
+ sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+ 
+  Begin Matrices ;
+  
+  NOTE: Definition yields  635 data vectors for analysis
+  NOTE: Vectors contain a total of  1194 observations
+  
+  
+     	R Stand nind nind Free ;				! correlatie matrix
+ 	T Full nthres nind free ;				! thresholds (6 family members)
+ 
+  	H Full 1 nind free ;					! age effect beta
+ 	G Full 1 nind fix ; 					! observed age effect						
+ 	K Full 1 nind free ;	 				! sex effect beta
+ 	L Full 1 nind fix ;	 					! observed sex effect
+  End Matrices ;
+ 
+ specify T	101 101 111 111 115 115		! thresholds MZM
+ 
+ specify H 	211 211 211 211 212 212		! age effect beta
+ specify K 	311 311 311 311 312 312		! sex effect beta
+ 
+ specify G 	age1 age2 age3 age4 age5 age6 	! observed age effect
+ specify L 	sex1 sex2 sex3 sex4 sex5 sex6	! observed sex effect
+ 
+ Specify R
+ 50
+ 2 2
+ 2 2 2
+ 3 3 3 3
+ 3 3 3 3 4
+ 
+ Covariance R ;
+ Start 0.50 R 2 1							! startwaarde MZM twins
+ Start 0.25 R 3 1 - R 6 5					! startwaardes broer-broer, broer-zus, zus-zus
+ Bound -0.999 0.999 R 2 1 - R 6 5 			! boundaries voor correlaties tussen -1 en +1		
+ 
+ Thresholds T+H.G + K.L ;
+ Start 1 T 1 1 - T 1 nind		 			! startwaardes alle thresholds
+ Bound -5.555 5.555 T 1 1 - T 1 nind		! boundaries over de volle range voor vrije schatting, geen 2e threshold dus geen risico voor boundary overlap
+ 
+ OPT func=1.E-8
+ End
+ 
+ 
+ The following MX script lines were read for group    2
+ 
+ 
+ !---------------------------------------------------------------------DZM----------------------------------------------------------------------
+ 
+ G2: DZM
+ Data NInput_vars= 20
+ Missing=-1	
+  
+  NOTE: Missing value *string* set to '-1'
+  
+ ORdinal_data file=mxinputdata.dat		! read in raw ordinal datafile, must be in same directory
+  Ordinal data read initiated
+  Note: Maximum ordinal/rectangular record length is:  1000
+  Note: It be increased by maxrec= parameter on the data line.
+  
+  NOTE: Rectangular file contained  4742 records with data
+        that contained a total of  74976 observations
+  
+ 	
+ LABELS
+ trapreg zyg crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6
+ 
+ select if zyg = 2; 							! select DZM
+  
+  NOTE: Select if yields  787 data vectors for analysis
+  NOTE: Vectors contain a total of      12189 observations
+  
+ 
+ select
+ crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+ 
+ definition
+  
+  NOTE: Selection yields  787 data vectors for analysis
+  NOTE: Vectors contain a total of      10615 observations
+  
+ sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+  Note: Global variable previously defined.  Updating SEX1                            
+  Note: Global variable previously defined.  Updating SEX2                            
+  Note: Global variable previously defined.  Updating SEX3                            
+  Note: Global variable previously defined.  Updating SEX4                            
+  Note: Global variable previously defined.  Updating SEX5                            
+  Note: Global variable previously defined.  Updating SEX6                            
+  Note: Global variable previously defined.  Updating AGE1                            
+  Note: Global variable previously defined.  Updating AGE2                            
+  Note: Global variable previously defined.  Updating AGE3                            
+  Note: Global variable previously defined.  Updating AGE4                            
+  Note: Global variable previously defined.  Updating AGE5                            
+  Note: Global variable previously defined.  Updating AGE6                            
+ 
+  Begin Matrices ;
+  
+  NOTE: Definition yields  787 data vectors for analysis
+  NOTE: Vectors contain a total of  1171 observations
+  
+  
+     	R Stand nind nind Free ;				! correlatie matrix
+    	T Full nthres nind free ;				! thresholds
+ 
+  	H Full 1 nind free ;					! age effect beta
+ 	G Full 1 nind fix ; 					! observed age effect						
+ 	K Full 1 nind free ;	 				! sex effect beta
+ 	L Full 1 nind fix ;	 					! observed sex effect
+  End Matrices ;
+ 
+ specify T	101 101 111 111 115 115		! thresholds DZM
+ 
+ specify H 	211 211 211 211 212 212		! age effect beta
+ specify K 	311 311 311 311 312 312		! sex effect beta
+ 
+ specify G 	age1 age2 age3 age4 age5 age6 	! observed age effect
+ specify L 	sex1 sex2 sex3 sex4 sex5 sex6	! observed sex effect
+ 
+ Specify R
+ 51
+ 2 2
+ 2 2 2
+ 3 3 3 3
+ 3 3 3 3 4
+ 
+ Covariance R;
+ Start 0.25 R 2 1							! startwaarde DZM twins
+ Start 0.25 R 3 1 - R 6 5					! startwaardes broer-broer, broer-zus, zus-zus
+ Bound -0.999 0.999 R 2 1 - R 6 5 			! boundaries voor correlaties tussen -1 en +1
+ 
+ Thresholds T+H.G + K.L ;
+ Start 1 T 1 1 - T 1 nind		 			! startwaardes alle thresholds
+ Bound -5.555 5.555 T 1 1 - T 1 nind		! boundaries over de volle range voor vrije schatting, geen 2e threshold dus geen risico voor boundary overlap
+ 
+ OPT func=1.E-8
+ End
+ 
+ 
+ The following MX script lines were read for group    3
+ 
+ 
+ !---------------------------------------------------------------------MZF----------------------------------------------------------------------
+ 
+ G3: MZF
+ Data NInput_vars= 20
+ Missing=-1	
+  
+  NOTE: Missing value *string* set to '-1'
+  
+ ORdinal_data file=mxinputdata.dat		! read in raw ordinal datafile, must be in same directory
+  Ordinal data read initiated
+  Note: Maximum ordinal/rectangular record length is:  1000
+  Note: It be increased by maxrec= parameter on the data line.
+  
+  NOTE: Rectangular file contained  4742 records with data
+        that contained a total of  74976 observations
+  
+ 	
+ LABELS
+ trapreg zyg crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6
+ 
+ select if zyg = 3; 							! select MZF
+  
+  NOTE: Select if yields 1521 data vectors for analysis
+  NOTE: Vectors contain a total of      24321 observations
+  
+ 
+ select
+ crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+ 
+ definition
+  
+  NOTE: Selection yields 1521 data vectors for analysis
+  NOTE: Vectors contain a total of      21279 observations
+  
+ sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+  Note: Global variable previously defined.  Updating SEX1                            
+  Note: Global variable previously defined.  Updating SEX2                            
+  Note: Global variable previously defined.  Updating SEX3                            
+  Note: Global variable previously defined.  Updating SEX4                            
+  Note: Global variable previously defined.  Updating SEX5                            
+  Note: Global variable previously defined.  Updating SEX6                            
+  Note: Global variable previously defined.  Updating AGE1                            
+  Note: Global variable previously defined.  Updating AGE2                            
+  Note: Global variable previously defined.  Updating AGE3                            
+  Note: Global variable previously defined.  Updating AGE4                            
+  Note: Global variable previously defined.  Updating AGE5                            
+  Note: Global variable previously defined.  Updating AGE6                            
+ 
+  Begin Matrices ;
+  
+  NOTE: Definition yields 1521 data vectors for analysis
+  NOTE: Vectors contain a total of  3027 observations
+  
+  
+     	R Stand nind nind Free ;				! correlatie matrix
+    	T Full nthres nind free ;				! thresholds
+ 
+  	H Full 1 nind free ;					! age effect beta
+ 	G Full 1 nind fix ; 					! observed age effect						
+ 	K Full 1 nind free ;	 				! sex effect beta
+ 	L Full 1 nind fix ;	 					! observed sex effect
+  End Matrices ;
+ 
+ specify T	105 105 111 111 115 115		! thresholds MZF
+ 
+ specify H 	212 212 211 211 212 212		! age effect beta
+ specify K 	312 312 311 311 312 312		! sex effect beta
+ 
+ specify G 	age1 age2 age3 age4 age5 age6 	! observed age effect
+ specify L 	sex1 sex2 sex3 sex4 sex5 sex6	! observed sex effect
+ 
+ Specify R
+ 52
+ 4 4
+ 4 4 2
+ 3 3 4 4
+ 3 3 4 4 3
+ 
+ Covariance R;
+ Start 0.50 R 2 1							! startwaarde MZF twins
+ Start 0.25 R 3 1 - R 6 5					! startwaardes broer-broer, broer-zus, zus-zus
+ Bound -0.999 0.999 R 2 1 - R 6 5 			! boundaries voor correlaties tussen -1 en +1
+ 
+ Thresholds T+H.G + K.L ;
+ Start 1 T 1 1 - T 1 nind		 			! startwaardes alle thresholds
+ Bound -5.555 5.555 T 1 1 - T 1 nind		! boundaries over de volle range voor vrije schatting, geen 2e threshold dus geen risico voor boundary overlap
+ 
+ OPT func=1.E-8
+ End
+ 
+ 
+ The following MX script lines were read for group    4
+ 
+ 
+ !---------------------------------------------------------------------DZF----------------------------------------------------------------------
+ 
+ G4: DZF
+ Data NInput_vars= 20
+ Missing=-1	
+  
+  NOTE: Missing value *string* set to '-1'
+  
+ ORdinal_data file=mxinputdata.dat		! read in raw ordinal datafile, must be in same directory
+  Ordinal data read initiated
+  Note: Maximum ordinal/rectangular record length is:  1000
+  Note: It be increased by maxrec= parameter on the data line.
+  
+  NOTE: Rectangular file contained  4742 records with data
+        that contained a total of  74976 observations
+  
+ 	
+ LABELS
+ trapreg zyg crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6
+ 
+ select if zyg = 4; 							! select DZF
+  
+  NOTE: Select if yields  807 data vectors for analysis
+  NOTE: Vectors contain a total of      12805 observations
+  
+ 
+ select
+ crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+ 
+ definition
+  
+  NOTE: Selection yields  807 data vectors for analysis
+  NOTE: Vectors contain a total of      11191 observations
+  
+ sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+  Note: Global variable previously defined.  Updating SEX1                            
+  Note: Global variable previously defined.  Updating SEX2                            
+  Note: Global variable previously defined.  Updating SEX3                            
+  Note: Global variable previously defined.  Updating SEX4                            
+  Note: Global variable previously defined.  Updating SEX5                            
+  Note: Global variable previously defined.  Updating SEX6                            
+  Note: Global variable previously defined.  Updating AGE1                            
+  Note: Global variable previously defined.  Updating AGE2                            
+  Note: Global variable previously defined.  Updating AGE3                            
+  Note: Global variable previously defined.  Updating AGE4                            
+  Note: Global variable previously defined.  Updating AGE5                            
+  Note: Global variable previously defined.  Updating AGE6                            
+ 
+  Begin Matrices ;
+  
+  NOTE: Definition yields  807 data vectors for analysis
+  NOTE: Vectors contain a total of  1507 observations
+  
+  
+     	R Stand nind nind Free ;				! correlatie matrix
+    	T Full nthres nind free ;				! thresholds
+ 
+  	H Full 1 nind free ;					! age effect beta
+ 	G Full 1 nind fix ; 					! observed age effect						
+ 	K Full 1 nind free ;	 				! sex effect beta
+ 	L Full 1 nind fix ;	 					! observed sex effect
+  End Matrices ;
+ 
+ specify T	105 105 111 111 115 115		! thresholds DZF
+ 
+ specify H 	212 212 211 211 212 212		! age effect beta
+ specify K 	312 312 311 311 312 312		! sex effect beta
+ 
+ specify G 	age1 age2 age3 age4 age5 age6 	! observed age effect
+ specify L 	sex1 sex2 sex3 sex4 sex5 sex6	! observed sex effect
+ 
+ Specify R
+ 53
+ 4 4
+ 4 4 2
+ 3 3 4 4
+ 3 3 4 4 3
+ 
+ Covariance R;
+ Start 0.25 R 2 1							! startwaarde DZF twins
+ Start 0.25 R 3 1 - R 6 5					! startwaardes broer-broer, broer-zus, zus-zus
+ Bound -0.999 0.999 R 2 1 - R 6 5 			! boundaries voor correlaties tussen -1 en +1
+ 
+ Thresholds T+H.G + K.L ;
+ Start 1 T 1 1 - T 1 nind		 			! startwaardes alle thresholds
+ Bound -5.555 5.555 T 1 1 - T 1 nind		! boundaries over de volle range voor vrije schatting, geen 2e threshold dus geen risico voor boundary overlap
+ 
+ OPT func=1.E-8
+ End
+ 
+ 
+ The following MX script lines were read for group    5
+ 
+ 
+ !---------------------------------------------------------------------DOS----------------------------------------------------------------------
+ 
+ G5: DOS
+ Data NInput_vars= 20
+ Missing=-1	
+  
+  NOTE: Missing value *string* set to '-1'
+  
+ ORdinal_data file=mxinputdata.dat		! read in raw ordinal datafile, must be in same directory
+  Ordinal data read initiated
+  Note: Maximum ordinal/rectangular record length is:  1000
+  Note: It be increased by maxrec= parameter on the data line.
+  
+  NOTE: Rectangular file contained  4742 records with data
+        that contained a total of  74976 observations
+  
+ 	
+ LABELS
+ trapreg zyg crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6
+ 
+ select if zyg = 5; 							! select DOS, order is Males Females
+  
+  NOTE: Select if yields  992 data vectors for analysis
+  NOTE: Vectors contain a total of      15577 observations
+  
+ 
+ select
+ crea1 crea2 crea3 crea4 crea5 crea6 sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+ 
+ definition
+  
+  NOTE: Selection yields  992 data vectors for analysis
+  NOTE: Vectors contain a total of      13593 observations
+  
+ sex1 sex2 sex3 sex4 sex5 sex6 age1 age2 age3 age4 age5 age6;
+  Note: Global variable previously defined.  Updating SEX1                            
+  Note: Global variable previously defined.  Updating SEX2                            
+  Note: Global variable previously defined.  Updating SEX3                            
+  Note: Global variable previously defined.  Updating SEX4                            
+  Note: Global variable previously defined.  Updating SEX5                            
+  Note: Global variable previously defined.  Updating SEX6                            
+  Note: Global variable previously defined.  Updating AGE1                            
+  Note: Global variable previously defined.  Updating AGE2                            
+  Note: Global variable previously defined.  Updating AGE3                            
+  Note: Global variable previously defined.  Updating AGE4                            
+  Note: Global variable previously defined.  Updating AGE5                            
+  Note: Global variable previously defined.  Updating AGE6                            
+ 
+  Begin Matrices ;
+  
+  NOTE: Definition yields  992 data vectors for analysis
+  NOTE: Vectors contain a total of  1689 observations
+  
+  
+     	R Stand nind nind Free ;				! correlatie matrix
+    	T Full nthres nind free ;				! thresholds
+ 
+  	H Full 1 nind free ;					! age effect beta
+ 	G Full 1 nind fix ; 					! observed age effect						
+ 	K Full 1 nind free ;	 				! sex effect beta
+ 	L Full 1 nind fix ;	 					! observed sex effect
+  End Matrices ;
+ 
+ specify T	101 105 111 111 115 115		! thresholds DOS
+ 
+ specify H 	211 212 211 211 212 212		! age effect beta
+ specify K 	311 312 311 311 312 312		! sex effect beta
+ 
+ specify G 	age1 age2 age3 age4 age5 age6 	! observed age effect
+ specify L 	sex1 sex2 sex3 sex4 sex5 sex6	! observed sex effect
+ 
+ Specify R
+ 54
+ 2 4
+ 2 4 2
+ 4 3 4 4
+ 4 3 4 4 3
+ 
+ Covariance R;
+ Start 0.25 R 2 1							! startwaarde DOS twins
+ Start 0.25 R 3 1 - R 6 5					! startwaardes broer-broer, broer-zus, zus-zus
+ Bound -0.999 0.999 R 2 1 - R 6 5 			! boundaries voor correlaties tussen -1 en +1
+ 
+ Thresholds T+H.G + K.L ;
+ Start 1 T 1 1 - T 1 nind		 			! startwaardes alle thresholds
+ Bound -5.555 5.555 T 1 1 - T 1 nind		! boundaries over de volle range voor vrije schatting, geen 2e threshold dus geen risico voor boundary overlap
+ 
+ OPT func=1.E-8
+ OPT Issat
+ OPT Multiple
+ End
+  
+  
+  Summary of VL file data for group  1
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7966    -7.7076    -8.7829    -7.9068    -3.7794     0.0177
+ Variance      1.8529    10.2753     1.9722     8.9474    20.9939     1.0935
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      1.8787     2.6693     1.5896     2.6236     3.5898     3.6542
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7575    -7.4409    -8.7638    -7.8031    -3.2677     0.9843
+ Variance      2.6089    14.7190     2.3064    10.5361    24.4638     0.1572
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    635.0000   364.0000    76.0000    15.0000    90.0000    14.0000
+     Mean      0.0157     0.0220     0.0263     0.0000     0.0222     0.0000
+ Variance      0.0155     0.0215     0.0256     0.0000     0.0217     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  2
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.4600    -4.7712    -8.7927    -6.9357    -7.0647    -4.6733
+ Variance      4.5543    20.3584     1.8579    14.2906    14.0581    20.4428
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.9735     3.5390     1.6719     3.5289     3.5068     3.3188
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.3291    -3.7865    -8.7713    -6.6747    -6.8653    -4.1588
+ Variance      6.9298    30.1679     2.2349    17.8459    16.7900    24.9748
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    381.0000   168.0000   183.0000    18.0000   373.0000    48.0000
+     Mean      0.0394     0.0238     0.0219     0.0556     0.0349     0.0000
+ Variance      0.0378     0.0232     0.0214     0.0525     0.0336     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  3
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.8073    -7.5966    -8.8749    -8.0581    -2.6303     0.0739
+ Variance      1.8079    11.0516     1.1300     7.8161    18.1893     1.0997
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.5444
+  Maximum      2.2581     3.7129     1.6719     3.6798     3.9220     4.3250
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.7758    -7.3149    -8.8619    -7.9678    -1.3051     2.0000
+ Variance      2.4159    15.6964     1.3616     9.2567    25.4322     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number   1521.0000  1064.0000   157.0000    21.0000   233.0000    31.0000
+     Mean      0.0289     0.0273     0.0382     0.0000     0.0386     0.0000
+ Variance      0.0281     0.0265     0.0368     0.0000     0.0371     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  4
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.7125    -7.5283    -8.8773    -8.0210    -4.0687    -0.0475
+ Variance      2.4996    11.0909     1.1032     7.9165    20.5416     0.8079
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      2.1633     2.4954     1.8364     2.6991     3.2577     3.9896
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.6456    -7.1871    -8.8637    -7.9095    -2.9752     2.0000
+ Variance      3.7728    16.6552     1.3445     9.7155    29.9746     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    807.0000   442.0000    88.0000    11.0000   133.0000    26.0000
+     Mean      0.0223     0.0339     0.0455     0.0909     0.0451     0.0000
+ Variance      0.0218     0.0328     0.0434     0.0826     0.0431     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  5
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.7452    -7.5493    -8.9419    -8.0711    -1.6170    -4.0084
+ Variance      2.1813    10.9948     0.4803     7.5366    11.1187    19.9279
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.4044     3.1911     0.6022     2.7745     3.7559     3.4865
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.6784    -7.2147    -8.9294    -7.9617     0.2258    -3.3851
+ Variance      3.4339    16.4509     0.7007     9.3050    16.3684    24.6219
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    557.0000   832.0000   103.0000     7.0000   161.0000    29.0000
+     Mean      0.0341     0.0252     0.0388     0.0000     0.0248     0.0690
+ Variance      0.0329     0.0246     0.0373     0.0000     0.0242     0.0642
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     1.0000
+  
+  
+  PARAMETER SPECIFICATIONS
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 211 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  50  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 111 111 115 115
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 211 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  51  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 111 111 115 115
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  212 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  52  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  105 105 111 111 115 115
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  212 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  53  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  105 105 111 111 115 115
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  54  0
+ 3   2  4  0
+ 4   2  4  2  0
+ 5   4  3  4  4  0
+ 6   4  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 105 111 111 115 115
+  
+  Mx starting optimization; number of parameters =  16
+  *** WARNING! ***
+  
+  I am not sure I have found a solution that satisfies
+           Kuhn-Tucker conditions for a minimum.
+           NAG's IFAIL parameter is  1
+  
+ We probably have a minimum here, but you might consider trying different
+ starting values.  You can randomize these with TH=n on  the OU line, where
+ n is the number of times you wish to do this.
+ I STRONGLY recommend BOundaries to be set if you use TH
+  
+  
+  
+  MX PARAMETER ESTIMATES
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.7257    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0177 -0.0177 -0.0177 -0.0177  0.1425  0.1425
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0795 -0.0795 -0.0795 -0.0795  0.3989  0.3989
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.5403  1.0000
+ 3   0.5441  0.5441  1.0000
+ 4   0.5441  0.5441  0.5441  1.0000
+ 5   0.5080  0.5080  0.5080  0.5080  1.0000
+ 6   0.5080  0.5080  0.5080  0.5080  0.3065  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0062     2.0062     1.9139     1.9139     1.0600     1.0600
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0177 -0.0177 -0.0177 -0.0177  0.1425  0.1425
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0795 -0.0795 -0.0795 -0.0795  0.3989  0.3989
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     1.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.4688  1.0000
+ 3   0.5441  0.5441  1.0000
+ 4   0.5441  0.5441  0.5441  1.0000
+ 5   0.5080  0.5080  0.5080  0.5080  1.0000
+ 6   0.5080  0.5080  0.5080  0.5080  0.3065  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0062     2.0062     1.9139     1.9139     1.0600     1.0600
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.2226    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.1425  0.1425 -0.0177 -0.0177  0.1425  0.1425
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.3989  0.3989 -0.0795 -0.0795  0.3989  0.3989
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.6942  1.0000
+ 3   0.3065  0.3065  1.0000
+ 4   0.3065  0.3065  0.5441  1.0000
+ 5   0.5080  0.5080  0.3065  0.3065  1.0000
+ 6   0.5080  0.5080  0.3065  0.3065  0.5080  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.1455     1.1455     1.9139     1.9139     1.0600     1.0600
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.5642    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.1425  0.1425 -0.0177 -0.0177  0.1425  0.1425
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.3989  0.3989 -0.0795 -0.0795  0.3989  0.3989
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.2524  1.0000
+ 3   0.3065  0.3065  1.0000
+ 4   0.3065  0.3065  0.5441  1.0000
+ 5   0.5080  0.5080  0.3065  0.3065  1.0000
+ 6   0.5080  0.5080  0.3065  0.3065  0.5080  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.1455     1.1455     1.9139     1.9139     1.0600     1.0600
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0177  0.1425 -0.0177 -0.0177  0.1425  0.1425
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0795  0.3989 -0.0795 -0.0795  0.3989  0.3989
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     2.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.3063  1.0000
+ 3   0.5441  0.3065  1.0000
+ 4   0.5441  0.3065  0.5441  1.0000
+ 5   0.3065  0.5080  0.3065  0.3065  1.0000
+ 6   0.3065  0.5080  0.3065  0.3065  0.5080  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0062     1.1455     1.9139     1.9139     1.0600     1.0600
+  
+  *** WARNING! ***
+  Minimization may not be successful.  See above
+  CODE GREEN - it probably was OK
+  
+ Your model has   16 estimated parameters and   8588 Observed statistics
+  
+ -2 times log-likelihood of data >>>  2115.081
+ Degrees of freedom >>>>>>>>>>>>>>>>      8572
+ Akaike's Information Criterion >>>>-15028.919
+ Bayesian Information Criterion >>>>-35220.082
+ Sample size Adjusted BIC       >>>>-21600.751
+ Deviance Information Criterion >>>>-27342.941
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ This problem used 40.3% of my workspace
+  
+ Task                     Time elapsed (DD:HH:MM:SS)
+ Reading script & data      0: 0: 0: 2.50
+ Execution                  0: 0: 0:23.19
+ TOTAL                      0: 0: 0:25.69
+  
+ Total number of warnings issued: 2
+ ______________________________________________________________________________
+   
+ 
+ !---------------------------------------------------------------------END----------------------------------------------------------------------
+ 
+ ! MODEL 0.
+ save tmp.mxs
+ 
+  Multiple fit option in effect.
+ 
+ The following MX script lines have been read:
+ 
+ SAVE TMP.MXS
+ 
+ ! MODEL 1. Equal Thresholds between male twins and brothers & female twins and sisters
+ get tmp.mxs
+  Note:  832137  binary records read
+ specify 1 T 101 101 101 101 105 105		! thresholds MZM
+ specify 2 T 101 101 101 101 105 105		! thresholds DZM
+ specify 3 T 105 105 101 101 105 105		! thresholds MZF
+ specify 4 T 105 105 101 101 105 105		! thresholds DZF
+ specify 5 T 101 105 101 101 105 105		! thresholds DOS
+ save tmp.mxs
+ end
+  
+  
+  Summary of VL file data for group  1
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7966    -7.7076    -8.7829    -7.9068    -3.7794     0.0177
+ Variance      1.8529    10.2753     1.9722     8.9474    20.9939     1.0935
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      1.8787     2.6693     1.5896     2.6236     3.5898     3.6542
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7575    -7.4409    -8.7638    -7.8031    -3.2677     0.9843
+ Variance      2.6089    14.7190     2.3064    10.5361    24.4638     0.1572
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    635.0000   364.0000    76.0000    15.0000    90.0000    14.0000
+     Mean      0.0157     0.0220     0.0263     0.0000     0.0222     0.0000
+ Variance      0.0155     0.0215     0.0256     0.0000     0.0217     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  2
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.4600    -4.7712    -8.7927    -6.9357    -7.0647    -4.6733
+ Variance      4.5543    20.3584     1.8579    14.2906    14.0581    20.4428
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.9735     3.5390     1.6719     3.5289     3.5068     3.3188
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.3291    -3.7865    -8.7713    -6.6747    -6.8653    -4.1588
+ Variance      6.9298    30.1679     2.2349    17.8459    16.7900    24.9748
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    381.0000   168.0000   183.0000    18.0000   373.0000    48.0000
+     Mean      0.0394     0.0238     0.0219     0.0556     0.0349     0.0000
+ Variance      0.0378     0.0232     0.0214     0.0525     0.0336     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  3
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.8073    -7.5966    -8.8749    -8.0581    -2.6303     0.0739
+ Variance      1.8079    11.0516     1.1300     7.8161    18.1893     1.0997
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.5444
+  Maximum      2.2581     3.7129     1.6719     3.6798     3.9220     4.3250
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.7758    -7.3149    -8.8619    -7.9678    -1.3051     2.0000
+ Variance      2.4159    15.6964     1.3616     9.2567    25.4322     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number   1521.0000  1064.0000   157.0000    21.0000   233.0000    31.0000
+     Mean      0.0289     0.0273     0.0382     0.0000     0.0386     0.0000
+ Variance      0.0281     0.0265     0.0368     0.0000     0.0371     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  4
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.7125    -7.5283    -8.8773    -8.0210    -4.0687    -0.0475
+ Variance      2.4996    11.0909     1.1032     7.9165    20.5416     0.8079
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      2.1633     2.4954     1.8364     2.6991     3.2577     3.9896
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.6456    -7.1871    -8.8637    -7.9095    -2.9752     2.0000
+ Variance      3.7728    16.6552     1.3445     9.7155    29.9746     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    807.0000   442.0000    88.0000    11.0000   133.0000    26.0000
+     Mean      0.0223     0.0339     0.0455     0.0909     0.0451     0.0000
+ Variance      0.0218     0.0328     0.0434     0.0826     0.0431     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  5
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.7452    -7.5493    -8.9419    -8.0711    -1.6170    -4.0084
+ Variance      2.1813    10.9948     0.4803     7.5366    11.1187    19.9279
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.4044     3.1911     0.6022     2.7745     3.7559     3.4865
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.6784    -7.2147    -8.9294    -7.9617     0.2258    -3.3851
+ Variance      3.4339    16.4509     0.7007     9.3050    16.3684    24.6219
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    557.0000   832.0000   103.0000     7.0000   161.0000    29.0000
+     Mean      0.0341     0.0252     0.0388     0.0000     0.0248     0.0690
+ Variance      0.0329     0.0246     0.0373     0.0000     0.0242     0.0642
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     1.0000
+  
+  
+  PARAMETER SPECIFICATIONS
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 211 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  50  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 105 105
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 211 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  51  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 105 105
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  212 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  52  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  105 105 101 101 105 105
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  212 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  53  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  105 105 101 101 105 105
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  54  0
+ 3   2  4  0
+ 4   2  4  2  0
+ 5   4  3  4  4  0
+ 6   4  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 105 101 101 105 105
+  
+  Mx starting optimization; number of parameters =  14
+  
+  
+  MX PARAMETER ESTIMATES
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.7257    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0177 -0.0177 -0.0177 -0.0177  0.1436  0.1436
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0912 -0.0912 -0.0912 -0.0912  0.4264  0.4264
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.5481  1.0000
+ 3   0.5240  0.5240  1.0000
+ 4   0.5240  0.5240  0.5240  1.0000
+ 5   0.4836  0.4836  0.4836  0.4836  1.0000
+ 6   0.4836  0.4836  0.4836  0.4836  0.3124  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9950     1.9950     1.9950     1.9950     1.0737     1.0737
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0177 -0.0177 -0.0177 -0.0177  0.1436  0.1436
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0912 -0.0912 -0.0912 -0.0912  0.4264  0.4264
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     1.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.4702  1.0000
+ 3   0.5240  0.5240  1.0000
+ 4   0.5240  0.5240  0.5240  1.0000
+ 5   0.4836  0.4836  0.4836  0.4836  1.0000
+ 6   0.4836  0.4836  0.4836  0.4836  0.3124  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9950     1.9950     1.9950     1.9950     1.0737     1.0737
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.2226    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.1436  0.1436 -0.0177 -0.0177  0.1436  0.1436
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.4264  0.4264 -0.0912 -0.0912  0.4264  0.4264
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.6999  1.0000
+ 3   0.3124  0.3124  1.0000
+ 4   0.3124  0.3124  0.5240  1.0000
+ 5   0.4836  0.4836  0.3124  0.3124  1.0000
+ 6   0.4836  0.4836  0.3124  0.3124  0.4836  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0737     1.0737     1.9950     1.9950     1.0737     1.0737
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.5642    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.1436  0.1436 -0.0177 -0.0177  0.1436  0.1436
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.4264  0.4264 -0.0912 -0.0912  0.4264  0.4264
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.2529  1.0000
+ 3   0.3124  0.3124  1.0000
+ 4   0.3124  0.3124  0.5240  1.0000
+ 5   0.4836  0.4836  0.3124  0.3124  1.0000
+ 6   0.4836  0.4836  0.3124  0.3124  0.4836  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0737     1.0737     1.9950     1.9950     1.0737     1.0737
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0177  0.1436 -0.0177 -0.0177  0.1436  0.1436
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0912  0.4264 -0.0912 -0.0912  0.4264  0.4264
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     2.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.3077  1.0000
+ 3   0.5240  0.3124  1.0000
+ 4   0.5240  0.3124  0.5240  1.0000
+ 5   0.3124  0.4836  0.3124  0.3124  1.0000
+ 6   0.3124  0.4836  0.3124  0.3124  0.4836  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9950     1.0737     1.9950     1.9950     1.0737     1.0737
+  
+ Your model has   14 estimated parameters and   8588 Observed statistics
+  
+ -2 times log-likelihood of data >>>  2116.840
+ Degrees of freedom >>>>>>>>>>>>>>>>      8574
+ Akaike's Information Criterion >>>>-15031.160
+ Bayesian Information Criterion >>>>-35227.667
+ Sample size Adjusted BIC       >>>>-21605.158
+ Deviance Information Criterion >>>>-27348.688
+  
+ Saturated model fit* >>>>>>>>>>>  2115.081
+ Saturated model df*  >>>>>>>>>>>      8572
+ Difference Chi-squared  >>>>>>>>     1.759
+ Difference d.f.  >>>>>>>>>>>>>>>         2
+ Probability >>>>>>>>>>>>>>>>>>>>     0.415
+ Akaike's Information Criterion >    -2.241
+ * Saturated model statistic computed earlier in this job
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ This problem used 40.3% of my workspace
+  
+ Task                     Time elapsed (DD:HH:MM:SS)
+ Reading script & data      0: 0: 0: 0.51
+ Execution                  0: 0: 0: 4.37
+ TOTAL                      0: 0: 0: 4.88
+  
+ Total number of warnings issued: 2
+ ______________________________________________________________________________
+   
+ 
+ ! MODEL 2. Equal Thresholds between males and females
+ get tmp.mxs
+ 
+  Multiple fit option in effect.
+ 
+ The following MX script lines have been read:
+ 
+ GET TMP.MXS
+  Note:  832137  binary records read
+ specify 1 T 101 101 101 101 101 101		! thresholds MZM
+ specify 2 T 101 101 101 101 101 101		! thresholds DZM
+ specify 3 T 101 101 101 101 101 101		! thresholds MZF
+ specify 4 T 101 101 101 101 101 101		! thresholds DZF
+ specify 5 T 101 101 101 101 101 101		! thresholds DOS
+ Option SAT=  2116.840,8574
+ save tmp.mxs
+ end
+  
+  
+  Summary of VL file data for group  1
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7966    -7.7076    -8.7829    -7.9068    -3.7794     0.0177
+ Variance      1.8529    10.2753     1.9722     8.9474    20.9939     1.0935
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      1.8787     2.6693     1.5896     2.6236     3.5898     3.6542
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7575    -7.4409    -8.7638    -7.8031    -3.2677     0.9843
+ Variance      2.6089    14.7190     2.3064    10.5361    24.4638     0.1572
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    635.0000   364.0000    76.0000    15.0000    90.0000    14.0000
+     Mean      0.0157     0.0220     0.0263     0.0000     0.0222     0.0000
+ Variance      0.0155     0.0215     0.0256     0.0000     0.0217     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  2
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.4600    -4.7712    -8.7927    -6.9357    -7.0647    -4.6733
+ Variance      4.5543    20.3584     1.8579    14.2906    14.0581    20.4428
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.9735     3.5390     1.6719     3.5289     3.5068     3.3188
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.3291    -3.7865    -8.7713    -6.6747    -6.8653    -4.1588
+ Variance      6.9298    30.1679     2.2349    17.8459    16.7900    24.9748
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    381.0000   168.0000   183.0000    18.0000   373.0000    48.0000
+     Mean      0.0394     0.0238     0.0219     0.0556     0.0349     0.0000
+ Variance      0.0378     0.0232     0.0214     0.0525     0.0336     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  3
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.8073    -7.5966    -8.8749    -8.0581    -2.6303     0.0739
+ Variance      1.8079    11.0516     1.1300     7.8161    18.1893     1.0997
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.5444
+  Maximum      2.2581     3.7129     1.6719     3.6798     3.9220     4.3250
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.7758    -7.3149    -8.8619    -7.9678    -1.3051     2.0000
+ Variance      2.4159    15.6964     1.3616     9.2567    25.4322     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number   1521.0000  1064.0000   157.0000    21.0000   233.0000    31.0000
+     Mean      0.0289     0.0273     0.0382     0.0000     0.0386     0.0000
+ Variance      0.0281     0.0265     0.0368     0.0000     0.0371     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  4
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.7125    -7.5283    -8.8773    -8.0210    -4.0687    -0.0475
+ Variance      2.4996    11.0909     1.1032     7.9165    20.5416     0.8079
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      2.1633     2.4954     1.8364     2.6991     3.2577     3.9896
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.6456    -7.1871    -8.8637    -7.9095    -2.9752     2.0000
+ Variance      3.7728    16.6552     1.3445     9.7155    29.9746     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    807.0000   442.0000    88.0000    11.0000   133.0000    26.0000
+     Mean      0.0223     0.0339     0.0455     0.0909     0.0451     0.0000
+ Variance      0.0218     0.0328     0.0434     0.0826     0.0431     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  5
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.7452    -7.5493    -8.9419    -8.0711    -1.6170    -4.0084
+ Variance      2.1813    10.9948     0.4803     7.5366    11.1187    19.9279
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.4044     3.1911     0.6022     2.7745     3.7559     3.4865
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.6784    -7.2147    -8.9294    -7.9617     0.2258    -3.3851
+ Variance      3.4339    16.4509     0.7007     9.3050    16.3684    24.6219
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    557.0000   832.0000   103.0000     7.0000   161.0000    29.0000
+     Mean      0.0341     0.0252     0.0388     0.0000     0.0248     0.0690
+ Variance      0.0329     0.0246     0.0373     0.0000     0.0242     0.0642
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     1.0000
+  
+  
+  PARAMETER SPECIFICATIONS
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 211 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  50  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 211 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  51  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  212 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  52  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  212 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  53  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  211 212 211 211 212 212
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  54  0
+ 3   2  4  0
+ 4   2  4  2  0
+ 5   4  3  4  4  0
+ 6   4  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  Mx starting optimization; number of parameters =  13
+  
+  
+  MX PARAMETER ESTIMATES
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.7257    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0168 -0.0168 -0.0168 -0.0168  0.1439  0.1439
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0016 -0.0016 -0.0016 -0.0016  0.0104  0.0104
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.5515  1.0000
+ 3   0.5217  0.5217  1.0000
+ 4   0.5217  0.5217  0.5217  1.0000
+ 5   0.4835  0.4835  0.4835  0.4835  1.0000
+ 6   0.4835  0.4835  0.4835  0.4835  0.3128  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9056     1.9056     1.9056     1.9056     1.9056     1.9056
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0168 -0.0168 -0.0168 -0.0168  0.1439  0.1439
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0016 -0.0016 -0.0016 -0.0016  0.0104  0.0104
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     1.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.4711  1.0000
+ 3   0.5217  0.5217  1.0000
+ 4   0.5217  0.5217  0.5217  1.0000
+ 5   0.4835  0.4835  0.4835  0.4835  1.0000
+ 6   0.4835  0.4835  0.4835  0.4835  0.3128  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9056     1.9056     1.9056     1.9056     1.9056     1.9056
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.2226    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.1439  0.1439 -0.0168 -0.0168  0.1439  0.1439
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.0104  0.0104 -0.0016 -0.0016  0.0104  0.0104
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.7004  1.0000
+ 3   0.3128  0.3128  1.0000
+ 4   0.3128  0.3128  0.5217  1.0000
+ 5   0.4835  0.4835  0.3128  0.3128  1.0000
+ 6   0.4835  0.4835  0.3128  0.3128  0.4835  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9056     1.9056     1.9056     1.9056     1.9056     1.9056
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.5642    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.1439  0.1439 -0.0168 -0.0168  0.1439  0.1439
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.0104  0.0104 -0.0016 -0.0016  0.0104  0.0104
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.2532  1.0000
+ 3   0.3128  0.3128  1.0000
+ 4   0.3128  0.3128  0.5217  1.0000
+ 5   0.4835  0.4835  0.3128  0.3128  1.0000
+ 6   0.4835  0.4835  0.3128  0.3128  0.4835  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9056     1.9056     1.9056     1.9056     1.9056     1.9056
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0168  0.1439 -0.0168 -0.0168  0.1439  0.1439
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0016  0.0104 -0.0016 -0.0016  0.0104  0.0104
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     2.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.3076  1.0000
+ 3   0.5217  0.3128  1.0000
+ 4   0.5217  0.3128  0.5217  1.0000
+ 5   0.3128  0.4835  0.3128  0.3128  1.0000
+ 6   0.3128  0.4835  0.3128  0.3128  0.4835  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.9056     1.9056     1.9056     1.9056     1.9056     1.9056
+  
+ Your model has   13 estimated parameters and   8588 Observed statistics
+  
+ -2 times log-likelihood of data >>>  2116.872
+ Degrees of freedom >>>>>>>>>>>>>>>>      8575
+ Akaike's Information Criterion >>>>-15033.128
+ Bayesian Information Criterion >>>>-35231.883
+ Sample size Adjusted BIC       >>>>-21607.785
+ Deviance Information Criterion >>>>-27351.985
+  
+ Saturated model fit* >>>>>>>>>>>  2116.840
+ Saturated model df*  >>>>>>>>>>>      8574
+ Difference Chi-squared  >>>>>>>>     0.032
+ Difference d.f.  >>>>>>>>>>>>>>>         1
+ Probability >>>>>>>>>>>>>>>>>>>>     0.857
+ Akaike's Information Criterion >    -1.968
+ * Saturated model statistic computed earlier in this job
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ This problem used 40.3% of my workspace
+  
+ Task                     Time elapsed (DD:HH:MM:SS)
+ Reading script & data      0: 0: 0: 0.31
+ Execution                  0: 0: 0: 5.66
+ TOTAL                      0: 0: 0: 5.97
+  
+ Total number of warnings issued: 2
+ ______________________________________________________________________________
+   
+ 
+ ! MODEL 3. Equal Age coefficients between males and females
+ get tmp.mxs
+ 
+  Multiple fit option in effect.
+ 
+ The following MX script lines have been read:
+ 
+ GET TMP.MXS
+  Note:  832137  binary records read
+ specify 1 H 201 201 201 201 201 201		! age effect beta
+ specify 2 H 201 201 201 201 201 201		! age effect beta
+ specify 3 H 201 201 201 201 201 201		! age effect beta
+ specify 4 H 201 201 201 201 201 201		! age effect beta
+ specify 5 H 201 201 201 201 201 201		! age effect beta
+ Option SAT=2116.872,8575  ! compare to model 2
+ !save tmp.mxs
+ end
+  
+  
+  Summary of VL file data for group  1
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7966    -7.7076    -8.7829    -7.9068    -3.7794     0.0177
+ Variance      1.8529    10.2753     1.9722     8.9474    20.9939     1.0935
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      1.8787     2.6693     1.5896     2.6236     3.5898     3.6542
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    635.0000   635.0000   635.0000   635.0000   635.0000   635.0000
+     Mean     -8.7575    -7.4409    -8.7638    -7.8031    -3.2677     0.9843
+ Variance      2.6089    14.7190     2.3064    10.5361    24.4638     0.1572
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    635.0000   364.0000    76.0000    15.0000    90.0000    14.0000
+     Mean      0.0157     0.0220     0.0263     0.0000     0.0222     0.0000
+ Variance      0.0155     0.0215     0.0256     0.0000     0.0217     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  2
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.4600    -4.7712    -8.7927    -6.9357    -7.0647    -4.6733
+ Variance      4.5543    20.3584     1.8579    14.2906    14.0581    20.4428
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.9735     3.5390     1.6719     3.5289     3.5068     3.3188
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    787.0000   787.0000   787.0000   787.0000   787.0000   787.0000
+     Mean     -8.3291    -3.7865    -8.7713    -6.6747    -6.8653    -4.1588
+ Variance      6.9298    30.1679     2.2349    17.8459    16.7900    24.9748
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     1.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    381.0000   168.0000   183.0000    18.0000   373.0000    48.0000
+     Mean      0.0394     0.0238     0.0219     0.0556     0.0349     0.0000
+ Variance      0.0378     0.0232     0.0214     0.0525     0.0336     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  3
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.8073    -7.5966    -8.8749    -8.0581    -2.6303     0.0739
+ Variance      1.8079    11.0516     1.1300     7.8161    18.1893     1.0997
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.5444
+  Maximum      2.2581     3.7129     1.6719     3.6798     3.9220     4.3250
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number   1521.0000  1521.0000  1521.0000  1521.0000  1521.0000  1521.0000
+     Mean     -8.7758    -7.3149    -8.8619    -7.9678    -1.3051     2.0000
+ Variance      2.4159    15.6964     1.3616     9.2567    25.4322     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number   1521.0000  1064.0000   157.0000    21.0000   233.0000    31.0000
+     Mean      0.0289     0.0273     0.0382     0.0000     0.0386     0.0000
+ Variance      0.0281     0.0265     0.0368     0.0000     0.0371     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  4
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.7125    -7.5283    -8.8773    -8.0210    -4.0687    -0.0475
+ Variance      2.4996    11.0909     1.1032     7.9165    20.5416     0.8079
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -1.2090
+  Maximum      2.1633     2.4954     1.8364     2.6991     3.2577     3.9896
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    807.0000   807.0000   807.0000   807.0000   807.0000   807.0000
+     Mean     -8.6456    -7.1871    -8.8637    -7.9095    -2.9752     2.0000
+ Variance      3.7728    16.6552     1.3445     9.7155    29.9746     0.0000
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000     2.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     2.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    807.0000   442.0000    88.0000    11.0000   133.0000    26.0000
+     Mean      0.0223     0.0339     0.0455     0.0909     0.0451     0.0000
+ Variance      0.0218     0.0328     0.0434     0.0826     0.0431     0.0000
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     1.0000     1.0000     0.0000
+  
+  
+  Summary of VL file data for group  5
+  
+                 AGE6       AGE5       AGE4       AGE3       AGE2       AGE1
+     Code    -12.0000   -11.0000   -10.0000    -9.0000    -8.0000    -7.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.7452    -7.5493    -8.9419    -8.0711    -1.6170    -4.0084
+ Variance      2.1813    10.9948     0.4803     7.5366    11.1187    19.9279
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      1.4044     3.1911     0.6022     2.7745     3.7559     3.4865
+ 
+                 SEX6       SEX5       SEX4       SEX3       SEX2       SEX1
+     Code     -6.0000    -5.0000    -4.0000    -3.0000    -2.0000    -1.0000
+   Number    992.0000   992.0000   992.0000   992.0000   992.0000   992.0000
+     Mean     -8.6784    -7.2147    -8.9294    -7.9617     0.2258    -3.3851
+ Variance      3.4339    16.4509     0.7007     9.3050    16.3684    24.6219
+  Minimum     -9.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  Maximum      2.0000     2.0000     1.0000     1.0000     2.0000     1.0000
+ 
+                CREA1      CREA2      CREA3      CREA4      CREA5      CREA6
+     Code      1.0000     2.0000     3.0000     4.0000     5.0000     6.0000
+   Number    557.0000   832.0000   103.0000     7.0000   161.0000    29.0000
+     Mean      0.0341     0.0252     0.0388     0.0000     0.0248     0.0690
+ Variance      0.0329     0.0246     0.0373     0.0000     0.0242     0.0642
+  Minimum      0.0000     0.0000     0.0000     0.0000     0.0000     0.0000
+  Maximum      1.0000     1.0000     1.0000     0.0000     1.0000     1.0000
+  
+  
+  PARAMETER SPECIFICATIONS
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  201 201 201 201 201 201
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  50  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  201 201 201 201 201 201
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 311 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  51  0
+ 3   2  2  0
+ 4   2  2  2  0
+ 5   3  3  3  3  0
+ 6   3  3  3  3  4  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  201 201 201 201 201 201
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  52  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  201 201 201 201 201 201
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  312 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  53  0
+ 3   4  4  0
+ 4   4  4  2  0
+ 5   3  3  4  4  0
+ 6   3  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1   -7  -8  -9 -10 -11 -12
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  201 201 201 201 201 201
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  311 312 311 311 312 312
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+     1  2  3  4  5  6
+ 1  -1 -2 -3 -4 -5 -6
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+     1  2  3  4  5  6
+ 1   0
+ 2  54  0
+ 3   2  4  0
+ 4   2  4  2  0
+ 5   4  3  4  4  0
+ 6   4  3  4  4  3  0
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+      1   2   3   4   5   6
+ 1  101 101 101 101 101 101
+  
+  Mx starting optimization; number of parameters =  12
+  
+  
+  MX PARAMETER ESTIMATES
+  
+  GROUP NUMBER: 1
+  
+G1: MZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.7257    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.0813  0.0813  0.0813  0.0813  0.0813  0.0813
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.1165 -0.1165 -0.1165 -0.1165 -0.0549 -0.0549
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.5314  1.0000
+ 3   0.4784  0.4784  1.0000
+ 4   0.4784  0.4784  0.4784  1.0000
+ 5   0.5060  0.5060  0.5060  0.5060  1.0000
+ 6   0.5060  0.5060  0.5060  0.5060  0.3108  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0248     2.0248     2.0248     2.0248     2.0248     2.0248
+  
+  GROUP NUMBER: 2
+  
+G2: DZM                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.0813  0.0813  0.0813  0.0813  0.0813  0.0813
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.1165 -0.1165 -0.1165 -0.1165 -0.0549 -0.0549
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     1.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.4714  1.0000
+ 3   0.4784  0.4784  1.0000
+ 4   0.4784  0.4784  0.4784  1.0000
+ 5   0.5060  0.5060  0.5060  0.5060  1.0000
+ 6   0.5060  0.5060  0.5060  0.5060  0.3108  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0248     2.0248     2.0248     2.0248     2.0248     2.0248
+  
+  GROUP NUMBER: 3
+  
+G3: MZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.2226    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.0813  0.0813  0.0813  0.0813  0.0813  0.0813
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0549 -0.0549 -0.1165 -0.1165 -0.0549 -0.0549
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.6994  1.0000
+ 3   0.3108  0.3108  1.0000
+ 4   0.3108  0.3108  0.4784  1.0000
+ 5   0.5060  0.5060  0.3108  0.3108  1.0000
+ 6   0.5060  0.5060  0.3108  0.3108  0.5060  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0248     2.0248     2.0248     2.0248     2.0248     2.0248
+  
+  GROUP NUMBER: 4
+  
+G4: DZF                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.5642    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.0813  0.0813  0.0813  0.0813  0.0813  0.0813
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.0549 -0.0549 -0.1165 -0.1165 -0.0549 -0.0549
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0000    -9.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.2584  1.0000
+ 3   0.3108  0.3108  1.0000
+ 4   0.3108  0.3108  0.4784  1.0000
+ 5   0.5060  0.5060  0.3108  0.3108  1.0000
+ 6   0.5060  0.5060  0.3108  0.3108  0.5060  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0248     2.0248     2.0248     2.0248     2.0248     2.0248
+  
+  GROUP NUMBER: 5
+  
+G5: DOS                                                                                                                         
+  
+  MATRIX G
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      0.0000     0.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX H
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1   0.0813  0.0813  0.0813  0.0813  0.0813  0.0813
+  
+  MATRIX K
+ This is a FULL matrix of order    1 by    6
+          1       2       3       4       5       6
+ 1  -0.1165 -0.0549 -0.1165 -0.1165 -0.0549 -0.0549
+  
+  MATRIX L
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      1.0000     2.0000    -9.0000    -9.0000    -9.0000    -9.0000
+  
+  MATRIX R
+ This is a STANDARDISED matrix of order    6 by    6
+          1       2       3       4       5       6
+ 1   1.0000
+ 2   0.2969  1.0000
+ 3   0.4784  0.3108  1.0000
+ 4   0.4784  0.3108  0.4784  1.0000
+ 5   0.3108  0.5060  0.3108  0.3108  1.0000
+ 6   0.3108  0.5060  0.3108  0.3108  0.5060  1.0000
+  
+  MATRIX T
+ This is a FULL matrix of order    1 by    6
+             1          2          3          4          5          6
+ 1      2.0248     2.0248     2.0248     2.0248     2.0248     2.0248
+  
+ Your model has   12 estimated parameters and   8588 Observed statistics
+  
+ -2 times log-likelihood of data >>>  2122.821
+ Degrees of freedom >>>>>>>>>>>>>>>>      8576
+ Akaike's Information Criterion >>>>-15029.179
+ Bayesian Information Criterion >>>>-35233.140
+ Sample size Adjusted BIC       >>>>-21607.454
+ Deviance Information Criterion >>>>-27352.324
+  
+ Saturated model fit* >>>>>>>>>>>  2116.872
+ Saturated model df*  >>>>>>>>>>>      8575
+ Difference Chi-squared  >>>>>>>>     5.949
+ Difference d.f.  >>>>>>>>>>>>>>>         1
+ Probability >>>>>>>>>>>>>>>>>>>>     0.015
+ Akaike's Information Criterion >     3.949
+ * Saturated model statistic computed earlier in this job
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ This problem used 40.3% of my workspace
+  
+ Task                     Time elapsed (DD:HH:MM:SS)
+ Reading script & data      0: 0: 0: 0.16
+ Execution                  0: 0: 0:22.49
+ TOTAL                      0: 0: 0:22.65
+  
+ Total number of warnings issued: 2
+ ______________________________________________________________________________
+   
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
