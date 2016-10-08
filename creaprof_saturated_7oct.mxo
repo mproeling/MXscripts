@@ -3,13 +3,13 @@
  
  ! SCRIPT NAME	:  creacovage_tests_jan30.mx - dit script is voor: twin 1, twin 2, brother 1, brother 2, sister 1, sister 2
  ! COVARIATES	: AGE SEX
- ! GOAL		: calculation of tetrachoric correlations, check assumptions of twin model,
- ! PARAMETERS: TOTAL= 16 [4 thresholds; twin males, twin females, brothers, sisters] + 8 correlaties (MZM DZM MZF DZF DOS-fm br-br si-si br-si) + 4 cov [age males, age females, sex males, sex females].
+ ! GOAL		: Saturated model, calculation of tetrachoric correlations, check assumptions of twin model, constrain parameters
+ ! PARAMETERS: TOTAL= 16 [4 thresholds; twin males, twin females, brothers, sisters] + 8 correlations (MZM DZM MZF DZF DOS-fm br-br si-si br-si) + 4 cov [age males, age females, sex males, sex females].
  ! DATA		: ordinal, one threshold
  ! INPUT		: raw data
  ! UNI/BI/MULTI	: uni
- ! DATA-GROUPS	: MZM, DZM, MZF, DZF, DOSMF [ordered in data cleaning]
- ! M.P. Roeling, Jan 2016, VU Amsterdam
+ ! DATA-GROUPS	: MZM, DZM, MZF, DZF, DOSMF [ordered in data cleaning, first always male]
+ ! M.P. Roeling, Jan 2016, VU Amsterdam / Uni of Oxford
  
  !---------------------------------------------------------------------MZM----------------------------------------------------------------------
  
